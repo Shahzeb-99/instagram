@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class Post extends StatelessWidget {
-  const Post({this.postPicture, this.username, this.caption, this.userProfilePicture, this.numberOfLikes, this.numberofComments, this.myProfilePicture});
+  Post({this.postPicture, this.username, this.caption, this.userProfilePicture, this.numberOfLikes, this.numberofComments, this.myProfilePicture});
 
   final String? caption;
   final String? userProfilePicture;
@@ -14,6 +14,9 @@ class Post extends StatelessWidget {
   final numberOfLikes;
   final numberofComments;
   final myProfilePicture;
+  var orignalValue;  //Transform controller value
+
+  TransformationController tcontroller= TransformationController();
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +43,19 @@ class Post extends StatelessWidget {
           SizedBox(
             height: 5,
           ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.symmetric(vertical: 10),
-            child: CachedNetworkImage(imageUrl: postPicture!),
+          InteractiveViewer(
+            transformationController: tcontroller,
+            onInteractionStart: (detail){
+              orignalValue=tcontroller.value;
+            },
+            onInteractionEnd: (detail){
+              tcontroller.value=orignalValue;
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              margin: EdgeInsets.symmetric(vertical: 10),
+              child: CachedNetworkImage(imageUrl: postPicture!),
+            ),
           ),
           Row(
             children: [
