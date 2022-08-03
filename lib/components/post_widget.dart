@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'profile_others.dart';
 
 class Post extends StatelessWidget {
   Post(
@@ -31,21 +32,34 @@ class Post extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 10,
-              ),
-              CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(
-                  "https://i1.sndcdn.com/artworks-000212816587-3pxa7y-t500x500.jpg",
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePageOthers(
+                      currentUsername: username!,
+                      currentUserProfilePicture:
+                          "https://i1.sndcdn.com/artworks-000212816587-3pxa7y-t500x500.jpg"),
                 ),
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text(username!)
-            ],
+              );
+            },
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 10,
+                ),
+                CircleAvatar(
+                  backgroundImage: CachedNetworkImageProvider(
+                    "https://i1.sndcdn.com/artworks-000212816587-3pxa7y-t500x500.jpg",
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(username!)
+              ],
+            ),
           ),
           SizedBox(
             height: 5,
@@ -79,7 +93,7 @@ class Post extends StatelessWidget {
               ),
               Container(
                 child: FaIcon(FontAwesomeIcons.comment),
-              )
+              ),
             ],
           ),
           SizedBox(
@@ -90,7 +104,7 @@ class Post extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('347,402 likes'),
+                Text('$numberOfLikes likes'),
                 Text(caption!),
                 SizedBox(
                   height: 5,
@@ -113,12 +127,12 @@ class Post extends StatelessWidget {
                     Text(
                       'Add a comment...',
                       style: TextStyle(color: Color(0xFF515357)),
-                    )
+                    ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

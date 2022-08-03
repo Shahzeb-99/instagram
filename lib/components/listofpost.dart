@@ -10,12 +10,6 @@ class ListOfPost extends ChangeNotifier {
 
   List<Container> list = [];
 
-  List<Container> getWidget(String currentUsername) {
-    getPost(currentUsername);
-    notifyListeners();
-    return list;
-  }
-
   void getPost(String currentUsername) {
     if (kDebugMode) {
       print(currentUsername);
@@ -33,7 +27,7 @@ class ListOfPost extends ChangeNotifier {
           if (kDebugMode) {
             print(url);
           }
-          final post = Container(child:CachedNetworkImage(imageUrl: url));
+          final post = Container(child:CachedNetworkImage(imageUrl: url,fit: BoxFit.fill,));
           list.add(post);
           print(list.length);
           notifyListeners();

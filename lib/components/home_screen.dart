@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
     pageController.animateToPage(index,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic);
   }
 
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getPosts() async {
     listOfPost = [];
-    final currentUser = await auth.currentUser;
+    final currentUser =  auth.currentUser;
     await cloud
         .collection("privateUsers")
         .where("email", isEqualTo: "${currentUser?.email}")
@@ -84,7 +84,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 final caption = posts.get('caption');
                 print(caption);
                 final timestamp = posts.get('timestamp');
+                print(timestamp);
+                final noOfLikes = posts.get('noOfLikes');
+                print(noOfLikes);
                 final post = Post(
+                  numberOfLikes: noOfLikes,
                   postPicture: url,
                   username: username,
                   caption: caption,
