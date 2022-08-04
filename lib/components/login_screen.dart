@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:instagram/components/home_screen.dart';
+import 'package:instagram/components/registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:true,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
           child: Container(
@@ -70,17 +71,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: TextField(
-
                       obscureText: true,
                       onChanged: (newPasswordEntry) {
                         password = newPasswordEntry;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(filled: true,
+                      decoration: InputDecoration(
+                        filled: true,
                         fillColor: Colors.white10,
                         border: const OutlineInputBorder(),
                         hintText: 'Password',
-
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
                           borderSide:
@@ -98,10 +98,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () async {
                       await _auth.signInWithEmailAndPassword(
                           email: email, password: password);
-                      if(_auth.currentUser!=null)
-                        {
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>HomeScreen()));
-                        }
+                      if (_auth.currentUser != null) {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => HomeScreen()));
+                      }
                     },
                     style: ButtonStyle(
                       // backgroundColor: MaterialStateProperty.all<Color>(
@@ -119,6 +119,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       //style: TextStyle(fontSize: 20),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      children: [
+                        const Text('Dont have an account?'),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const RegistrationScreen()));
+                          },
+                          child: const Text(
+                            ' Sign up',
+                            style: TextStyle(color: Colors.blueAccent),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),

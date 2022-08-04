@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:instagram/components/home_screen.dart';
+import 'package:instagram/components/login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -10,7 +12,6 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-
   late String email;
   late String password;
   late String username;
@@ -18,6 +19,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
   final _cloud = FirebaseFirestore.instance;
 
+  void getUsernames() async {await _cloud
+        .collection('publicUsers')
+        .where("username", isEqualTo: username)
+        .get()
+        .then(
+      (value) {
+         {
+          _auth.createUserWithEmailAndPassword(
+              email: email, password: password);
+          final user = {
+            "username": username,
+            "fullname": fullname,
+            "profilepicture":
+                "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?k=20&m=1223671392&s=170667a&w=0&h=kEAA35Eaz8k8A3qAGkuY8OZxpfvn9653gDjQwDHZGPE=",
+            "email": email,
+          };
+          _cloud.collection('publicUsers').doc(username).set(user);
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +74,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: TextField(
                       onChanged: (newEmailEntry) {
-                        email=newEmailEntry;
+                        email = newEmailEntry;
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
@@ -73,7 +97,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: TextField(
                       onChanged: (newFullnameEntry) {
-                        fullname=newFullnameEntry;
+                        fullname = newFullnameEntry;
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
@@ -96,7 +120,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: TextField(
                       onChanged: (newUsernameEntry) {
-                        username=newUsernameEntry;
+                        username = newUsernameEntry;
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
@@ -120,7 +144,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     child: TextField(
                       obscureText: true,
                       onChanged: (newPasswordEntry) {
-                        password=newPasswordEntry;
+                        password = newPasswordEntry;
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
@@ -141,9 +165,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      await _auth.createUserWithEmailAndPassword(email: email, password: password);
-                      await _cloud.collection('user').doc('private').set({'$username':{'email':{email,fullname}}});
-                      
+                      getUsernames();
+
+                      // await _auth.createUserWithEmailAndPassword(
+                      //     email: email, password: password);
+                      // await _cloud
+                      //     .collection('publicUsers')
+                      //     .doc('username')
+                      //     .set({
+                      //   '$username': {
+                      //     'email': {email, fullname}
+                      //   }
+                      // });
                     },
                     style: ButtonStyle(
                       // backgroundColor: MaterialStateProperty.all<Color>(
@@ -160,6 +193,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       'Sign up',
                       //style: TextStyle(fontSize: 20),
                     ),
+                  ),
+                  Row(
+                    children: [
+                      const Text('Already have an account?'),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginScreen()));
+                        },
+                        child: const Text(
+                          ' Sign in',
+                          style: TextStyle(color: Colors.blueAccent),
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),

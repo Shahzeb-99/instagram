@@ -2,6 +2,7 @@
 
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:instagram/components/image_picker.dart';
 import 'package:instagram/components/listofpost.dart';
 import 'package:instagram/components/profile_page.dart';
 import 'post_widget.dart';
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     listOfPost = [];
     final currentUser =  auth.currentUser;
     await cloud
-        .collection("privateUsers")
+        .collection("publicUsers")
         .where("email", isEqualTo: "${currentUser?.email}")
         .get()
         .then(
@@ -61,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     Provider.of<ListOfPost>(context,listen: false).getPost(currentUsername);
     await cloud
-        .collection("privateUsers")
+        .collection("publicUsers")
         .doc(currentUsername)
         .collection("following")
         .get()
@@ -114,6 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
         // selectedItemColor: Colors.white,
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.white,
@@ -125,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             label: 'Search',
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.add_box_outlined),
           ),
           BottomNavigationBarItem(
             label: 'Profile',
@@ -184,12 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            const Center(
-              child: Icon(
-                Icons.ac_unit,
-                size: 50,
-              ),
-            ),
+            UploadPage(currentUsername: currentUsername,),
             ProfilePage(
               currentUsername: currentUsername,
               currentUserProfilePicture: currentUserProfilePicture,

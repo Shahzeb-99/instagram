@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/components/login_screen.dart';
+import 'package:instagram/components/registration_screen.dart';
 import 'package:provider/provider.dart';
 import 'components/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';

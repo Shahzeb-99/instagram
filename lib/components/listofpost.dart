@@ -16,7 +16,7 @@ class ListOfPost extends ChangeNotifier {
     }
     list = [];
     cloud
-        .collection("privateUsers")
+        .collection("publicUsers")
         .doc(currentUsername)
         .collection("posts")
         .get()
