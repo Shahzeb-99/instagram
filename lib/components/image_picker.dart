@@ -22,7 +22,7 @@ class _UploadPageState extends State<UploadPage> {
   XFile? pickedFile;
 
   Future<void> _chooseImage() async {
-    pickedFile = await picker.pickImage(source: ImageSource.camera);
+    pickedFile = await picker.pickImage(source: ImageSource.camera,maxHeight: 800,maxWidth: 800);
     print(pickedFile?.path);
     pickedImage = File((pickedFile?.path)!);
     Navigator.push(
@@ -55,7 +55,10 @@ class _UploadPageState extends State<UploadPage> {
             TextButton(
               onPressed: () {
                 auth.signOut();
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>LoginScreen()), (route) => false);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                    (route) => false);
               },
               child: Text('Sign Out'),
             )

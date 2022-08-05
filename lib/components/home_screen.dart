@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
+// ignore_for_file: prefer_typing_uninitialized_variables, avoid_print, use_build_context_synchronously
 
 import 'dart:core';
 import 'package:flutter/material.dart';
@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getPosts() async {
     listOfPost = [];
-    final currentUser =  auth.currentUser;
+    final currentUser = auth.currentUser;
     await cloud
         .collection("publicUsers")
         .where("email", isEqualTo: "${currentUser?.email}")
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         print(currentUsername);
       },
     );
-    Provider.of<ListOfPost>(context,listen: false).getPost(currentUsername);
+    Provider.of<ListOfPost>(context, listen: false).getPost(currentUsername);
     await cloud
         .collection("publicUsers")
         .doc(currentUsername)
@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     updateNewsfeed();
-    
+
     super.initState();
   }
 
@@ -150,44 +150,44 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             RefreshIndicator(
               onRefresh: updateNewsfeed,
-              child: Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: Image.asset('assets/Instagram_logo.png'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Expanded(
-                      child: listOfPost.isNotEmpty
-                          ? ListView.builder(
-                              key: const PageStorageKey<String>('2'),
-                              itemCount: listOfPost.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return listOfPost[index];
-                              },
-                            )
-                          : const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: Image.asset('assets/Instagram_logo.png'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Expanded(
+                    child: listOfPost.isNotEmpty
+                        ? ListView.builder(
+                            key: const PageStorageKey<String>('2'),
+                            itemCount: listOfPost.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return listOfPost[index];
+                            },
+                          )
+                        : const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
                             ),
-                    ), // Post()
-                  ],
-                ),
+                          ),
+                  ), // Post()
+                ],
               ),
             ),
-            UploadPage(currentUsername: currentUsername,),
+            UploadPage(
+              currentUsername: currentUsername,
+            ),
             ProfilePage(
               currentUsername: currentUsername,
               currentUserProfilePicture: currentUserProfilePicture,

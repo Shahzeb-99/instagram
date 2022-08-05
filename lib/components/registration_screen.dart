@@ -18,6 +18,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late String fullname;
   final _auth = FirebaseAuth.instance;
   final _cloud = FirebaseFirestore.instance;
+  late bool isFollowing;
 
   void getUsernames() async {await _cloud
         .collection('publicUsers')
@@ -42,6 +43,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +205,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => LoginScreen()));
+                                  builder: (context) => const LoginScreen()));
                         },
                         child: const Text(
                           ' Sign in',

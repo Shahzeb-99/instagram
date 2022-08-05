@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'listofpost.dart';
 import 'package:provider/provider.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage(
       {Key? key,
       required this.currentUsername,
@@ -13,7 +13,11 @@ class ProfilePage extends StatelessWidget {
   final String currentUsername;
   final String currentUserProfilePicture;
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
 
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
 
@@ -24,7 +28,7 @@ class ProfilePage extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                currentUsername,
+                widget.currentUsername,
                 style: const TextStyle(fontSize: 25),
               ),
               Expanded(
@@ -42,7 +46,7 @@ class ProfilePage extends StatelessWidget {
               CircleAvatar(
                 radius: 40,
                 backgroundImage: CachedNetworkImageProvider(
-                  currentUserProfilePicture,
+                  widget.currentUserProfilePicture,
                 ),
               ),
               const Text(

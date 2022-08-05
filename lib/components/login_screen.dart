@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+
       body: SafeArea(
         child: Center(
           child: Container(
@@ -40,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 250,
                     child: Divider(
                       thickness: 1,
-                      color: Colors.white30,
+                      color: Colors.white30
+                      ,
                     ),
                   ),
                   Padding(
@@ -72,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: TextField(
                       obscureText: true,
+
                       onChanged: (newPasswordEntry) {
                         password = newPasswordEntry;
                       },
@@ -123,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
                       children: [
-                        const Text('Dont have an account?'),
+                        const Text('Don\'t have an account?'),
                         GestureDetector(
                           onTap: () {
                             Navigator.pushReplacement(
