@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'listofpost.dart';
-import 'package:provider/provider.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class ProfilePageOthers extends StatefulWidget {
@@ -83,11 +81,8 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
         .collection('publicUsers')
         .where('email', isEqualTo: auth.currentUser?.email)
         .get();
-    currentUser.then((value) {
+    await currentUser.then((value) {
       currentUsername = value.docs[0].get('username');
-      if (kDebugMode) {
-        print('${currentProfileUsername}heelog');
-      }
       cloud
           .collection('publicUsers')
           .doc(value.docs[0].get('username'))
@@ -95,30 +90,23 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
           .where('username', isEqualTo: currentProfileUsername)
           .get()
           .then((value) {
-        if (kDebugMode) {
-          print(value.docs[0].get('username'));
-        }
         if (value.docs[0].get('username') == currentProfileUsername) {
           setState(() {
             following = true;
-            if (kDebugMode) {
-              print('condition1');
-            }
           });
         } else {
           following = false;
-          if (kDebugMode) {
-            print('condition2');
-          }
         }
-        if (kDebugMode) {
-          print(following.toString());
-        }
-        setState(() {
-          progressHUD = false;
-        });
+
+
       });
+
     });
+    setState(() {
+      progressHUD = false;
+    });
+
+
   }
 
   void getPost(String currentUsername) {
@@ -145,9 +133,6 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
             fit: BoxFit.fill,
           ));
           list.add(post);
-          if (kDebugMode) {
-            print(list.length);
-          }
         }
         setState(() {});
       },
@@ -214,14 +199,13 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
                         backgroundColor: MaterialStateProperty.all(
                             following ? Colors.white10 : Colors.blueAccent)),
                     onPressed: () async {
-                      if(isButtonActive == true){
-                        isButtonActive=false;
+                      if (isButtonActive == true) {
+                        isButtonActive = false;
                         await toggleFollow(widget.currentUsername);
                         setState(() {
                           following = !following;
-
                         });
-                        isButtonActive=true;
+                        isButtonActive = true;
                       }
                     },
                     child: following
@@ -239,21 +223,18 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
                 child: const Icon(Icons.grid_on_sharp),
               ),
               Expanded(
-                child: Consumer(
-                  builder: (BuildContext context, profilePosts, Widget? child) {
-                    return GridView.builder(
-                        itemCount: list.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                        ),
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                              onTap: () {}, child: list[index]);
-                        });
-                  },
-                ),
-              )
+                  child: GridView.builder(
+                      itemCount: list.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisSpacing: 3,
+                        crossAxisSpacing: 3,
+                        crossAxisCount: 3,
+                      ),
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                            onTap: () {}, child: list[index]);
+                      }))
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print, use_build_context_synchronously
 
 import 'dart:core';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/components/image_picker.dart';
 import 'package:instagram/components/listofpost.dart';
@@ -20,8 +21,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool init = true;
   int _selectedIndex = 0;
   PageController pageController = PageController();
+
 
   void _onItemTapped(int index) {
     setState(
@@ -33,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic);
   }
-
+  late bool postLiked;
   final cloud = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   String currentUserProfilePicture = '';
@@ -76,8 +79,24 @@ class _HomeScreenState extends State<HomeScreen> {
               .collection("posts")
               .get()
               .then(
-            (value) {
+            (value) async {
               for (var posts in value.docs) {
+                print(currentUsername);
+                final postid = posts.id;
+
+                await posts.reference
+                    .collection('likes')
+                    .where('username', isEqualTo: currentUsername)
+                    .get()
+                    .then((value) {
+                  if (value.docs.isNotEmpty ) {
+                    postLiked=true;
+                    print('liked');
+                  } else {
+                    postLiked=false;
+                    print('Not Liked');
+                  }
+                });
                 final url = posts.get('url');
                 print(url);
                 final username = posts.get('username');
@@ -89,6 +108,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 final noOfLikes = posts.get('noOfLikes');
                 print(noOfLikes);
                 final post = Post(
+                  postLiked: postLiked,
+                  loggedinUser: currentUsername,
+                  postID: postid,
                   numberOfLikes: noOfLikes,
                   postPicture: url,
                   username: username,
@@ -148,42 +170,44 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           controller: pageController,
           children: [
-            RefreshIndicator(
-              onRefresh: updateNewsfeed,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      SizedBox(
-                        height: 50,
-                        child: Image.asset('assets/Instagram_logo.png'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(
-                    child: listOfPost.isNotEmpty
-                        ? ListView.builder(
-                            key: const PageStorageKey<String>('2'),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    SizedBox(
+                      height: 50,
+                      child: Image.asset('assets/Instagram_logo.png'),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Expanded(
+                  child: listOfPost.isNotEmpty
+                      ? RefreshIndicator(
+                          onRefresh: updateNewsfeed,
+                          child: ListView.builder(
+                            physics: const ScrollPhysics(
+                                parent: BouncingScrollPhysics()),
+                            key: const PageStorageKey<String>(''),
                             itemCount: listOfPost.length,
                             itemBuilder: (BuildContext context, int index) {
                               return listOfPost[index];
                             },
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
                           ),
-                  ), // Post()
-                ],
-              ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        ),
+                ), // Post()
+              ],
             ),
             UploadPage(
               currentUsername: currentUsername,

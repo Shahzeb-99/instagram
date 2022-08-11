@@ -20,11 +20,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 20.0,right: 20,top: 15),
+          padding: const EdgeInsets.only(left: 20.0, right: 20, top: 15),
           child: Row(
             children: [
               Text(
@@ -39,7 +38,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30,horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -49,8 +48,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   widget.currentUserProfilePicture,
                 ),
               ),
-              const Text(
-                '1\n Posts',
+              Text(
+                '${Provider.of<ListOfPost>(context).list.length}\n Posts',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 15),
               ),
@@ -71,21 +70,25 @@ class _ProfilePageState extends State<ProfilePage> {
           width: MediaQuery.of(context).size.width,
           height: 50,
           decoration: const BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(color: Colors.white, width: 2))),
+              border:
+                  Border(bottom: BorderSide(color: Colors.white, width: 2))),
           child: const Icon(Icons.grid_on_sharp),
         ),
         Expanded(
           child: Consumer(
-            builder:  (BuildContext context, profilePosts, Widget? child){return GridView.builder(
-                itemCount: Provider.of<ListOfPost>(context).list.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return Provider.of<ListOfPost>(context).list[index];
-                });},
-
+            builder: (BuildContext context, profilePosts, Widget? child) {
+              return GridView.builder(
+                controller: ScrollController(initialScrollOffset: 5),
+                  itemCount: Provider.of<ListOfPost>(context).list.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisSpacing: 3,
+                    crossAxisSpacing: 3,
+                    crossAxisCount: 3,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return Provider.of<ListOfPost>(context).list[index];
+                  });
+            },
           ),
         )
       ],
