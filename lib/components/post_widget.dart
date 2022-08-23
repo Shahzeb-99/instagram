@@ -3,32 +3,35 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:instagram/components/comments.dart';
 import 'profile_others.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Post extends StatefulWidget {
   Post(
-      {required this.postLiked,
+      {Key? key,
+      required this.numberofComments,
+      required this.postLiked,
       required this.loggedinUser,
       required this.postID,
       this.postPicture,
       this.username,
       this.caption,
-      this.userProfilePicture,
+      required this.userProfilePicture,
       required this.numberOfLikes,
-      this.numberofComments,
-      this.myProfilePicture});
+      this.myProfilePicture})
+      : super(key: key);
 
   bool postLiked;
 
   final String? caption;
-  final String? userProfilePicture;
+  final String userProfilePicture;
   final String? username;
   final String? postPicture;
   final String postID;
   int numberOfLikes;
   final String loggedinUser;
-  final numberofComments;
+  int numberofComments;
   final myProfilePicture;
 
   @override
@@ -37,7 +40,8 @@ class Post extends StatefulWidget {
 
 class _PostState extends State<Post> {
   var orignalValue;
- //Transform controller value
+
+  //Transform controller value
   final cloud = FirebaseFirestore.instance;
 
   bool likeButtonActive = true;
@@ -56,7 +60,7 @@ class _PostState extends State<Post> {
         .get()
         .then(
       (value) {
-        if (value.docs.isEmpty)  {
+        if (value.docs.isEmpty) {
           cloud
               .collection('publicUsers')
               .doc(widget.username)
@@ -160,11 +164,10 @@ class _PostState extends State<Post> {
                 onTap: () async {
                   if (likeButtonActive) {
                     setState(() {
-                      widget.postLiked=!widget.postLiked;
+                      widget.postLiked = !widget.postLiked;
                     });
                     await likeToggle();
-                    setState(() {
-                    });
+                    setState(() {});
                   }
                 },
                 child: widget.postLiked
@@ -201,9 +204,22 @@ class _PostState extends State<Post> {
                 SizedBox(
                   height: 5,
                 ),
-                Text(
-                  'View all 1,259 comments',
-                  style: TextStyle(color: Color(0xFF515357)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Comments(
+                                  postID: widget.postID,
+                                  username: widget.username!,
+                                  userProfilePicture: widget.userProfilePicture,
+                                  loggedInUser: widget.loggedinUser,
+                                )));
+                  },
+                  child: Text(
+                    'View all ${widget.numberofComments} comments',
+                    style: TextStyle(color: Color(0xFF515357)),
+                  ),
                 ),
                 SizedBox(
                   height: 5,
@@ -211,7 +227,9 @@ class _PostState extends State<Post> {
                 Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage: AssetImage('assets/cover3.jpg'),
+                      backgroundImage: CachedNetworkImageProvider(
+                        widget.userProfilePicture,
+                      ),
                     ),
                     SizedBox(
                       width: 10,

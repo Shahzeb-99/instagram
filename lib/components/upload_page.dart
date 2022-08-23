@@ -45,7 +45,8 @@ class _UploadPictureState extends State<UploadPicture> {
       "url": url,
       "timestamp": Timestamp.now(),
       "caption": caption,
-      "noOfLikes": 0
+      "noOfLikes": 0,
+      "noOfComments" : 0
     };
     await cloud
         .collection('publicUsers')

@@ -21,10 +21,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool init = true;
-  int _selectedIndex = 0;
-  PageController pageController = PageController();
-
+  int _selectedIndex = 0; // Index of Page view
+  PageController pageController = PageController(); // Pageview controller
 
   void _onItemTapped(int index) {
     setState(
@@ -36,21 +34,31 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic);
   }
-  late bool postLiked;
+
+  bool postCheck =
+      false; // Used to show Circle Progress Indicator while fetching posts
+  late bool
+      postLiked; // Check if post is liked or not, used in fill color of like icon
   final cloud = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   String currentUserProfilePicture = '';
   String currentUsername = '';
-  late List<Post> listOfPost;
+  late List<Post> listOfPost; // List of Post used in Listview Builder
 
   Future<void> updateNewsfeed() async {
+    setState(() {
+      postCheck = false;
+    });
     await getPosts();
-    setState(() {});
+    setState(() {
+      postCheck = true;
+    });
+
     return Future.delayed(const Duration(seconds: 0));
   }
 
   Future<void> getPosts() async {
-    listOfPost = [];
+    listOfPost = []; // Reset on update
     final currentUser = auth.currentUser;
     await cloud
         .collection("publicUsers")
@@ -63,17 +71,17 @@ class _HomeScreenState extends State<HomeScreen> {
         print(currentUsername);
       },
     );
-    Provider.of<ListOfPost>(context, listen: false).getPost(currentUsername);
+    Provider.of<ListOfPost>(context, listen: false).getPost(currentUsername); // Refresh ProfilePage Posts
     await cloud
         .collection("publicUsers")
         .doc(currentUsername)
         .collection("following")
         .get()
         .then(
-      (value) {
+      (value) async {
         for (var user in value.docs) {
           print(user.get('username'));
-          cloud
+          await cloud
               .collection("publicUsers")
               .doc(user.get('username'))
               .collection("posts")
@@ -89,12 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     .where('username', isEqualTo: currentUsername)
                     .get()
                     .then((value) {
-                  if (value.docs.isNotEmpty ) {
-                    postLiked=true;
-                    print('liked');
+                  if (value.docs.isNotEmpty) {
+                    postLiked = true;
                   } else {
-                    postLiked=false;
-                    print('Not Liked');
+                    postLiked = false;
                   }
                 });
                 final url = posts.get('url');
@@ -104,10 +110,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 final caption = posts.get('caption');
                 print(caption);
                 final timestamp = posts.get('timestamp');
-                print(timestamp);
+                final noOfComments = posts.get('noOfComments');
                 final noOfLikes = posts.get('noOfLikes');
                 print(noOfLikes);
                 final post = Post(
+                  userProfilePicture: currentUserProfilePicture,
+                  numberofComments: noOfComments,
                   postLiked: postLiked,
                   loggedinUser: currentUsername,
                   postID: postid,
@@ -116,8 +124,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   username: username,
                   caption: caption,
                 );
-                listOfPost.add(post);
-                setState(() {});
+
+                setState(() {
+                  listOfPost.add(post);
+                });
               }
             },
           );
@@ -129,7 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     updateNewsfeed();
-
     super.initState();
   }
 
@@ -188,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 10,
                 ),
                 Expanded(
-                  child: listOfPost.isNotEmpty
+                  child: listOfPost.isNotEmpty // Check list of post
                       ? RefreshIndicator(
                           onRefresh: updateNewsfeed,
                           child: ListView.builder(
@@ -201,11 +210,35 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         )
-                      : const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
-                        ),
+                      : postCheck == false // If List is empty and updateNewfeed() still running show CircleProgressIndicator else Text and Refresh Button
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('No Post'),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  OutlinedButton(
+                                      style: ButtonStyle(
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.cyanAccent)),
+                                      onPressed: () {
+                                        Future.delayed(Duration(seconds: 1),
+                                            () {
+                                          updateNewsfeed();
+                                        });
+                                      },
+                                      child: const Text('Tap to Refresh'))
+                                ],
+                              ),
+                            ),
                 ), // Post()
               ],
             ),

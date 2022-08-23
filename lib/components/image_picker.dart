@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -10,7 +12,8 @@ import 'package:animations/animations.dart';
 class UploadPage extends StatefulWidget {
   final String currentUsername;
 
-  UploadPage({required this.currentUsername});
+  // ignore: use_key_in_widget_constructors
+  const UploadPage({required this.currentUsername});
 
   @override
   State<UploadPage> createState() => _UploadPageState();
@@ -26,7 +29,6 @@ class _UploadPageState extends State<UploadPage> {
   Future<void> _chooseImage() async {
     pickedFile = await picker.pickImage(
         source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
-    print(pickedFile?.path);
     pickedImage = File((pickedFile?.path)!);
     Navigator.push(
         context,
@@ -50,13 +52,15 @@ class _UploadPageState extends State<UploadPage> {
               height: 10,
             ),
             OpenContainer(
-              middleColor: Colors.black,
+              transitionType: ContainerTransitionType.fadeThrough,
+              middleColor: Colors.grey.shade700,
               openColor: Colors.black,
-              closedColor: Colors.black,
+              closedColor: Colors.transparent,
               openElevation: 10,
               closedElevation: 0,
               transitionDuration: const Duration(milliseconds: 500),
               closedBuilder: (BuildContext c, VoidCallback action) => Card(
+                color: Colors.grey.shade700,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(

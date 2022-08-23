@@ -26,7 +26,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         .get()
         .then(
       (value) {
-         {
+         if(value.docs.isEmpty){
           _auth.createUserWithEmailAndPassword(
               email: email, password: password);
           final user = {
@@ -81,6 +81,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white10,
                         border: const OutlineInputBorder(),
                         hintText: 'Email',
                         focusedBorder: OutlineInputBorder(
@@ -104,6 +106,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white10,
                         border: const OutlineInputBorder(),
                         hintText: 'Fullname',
                         focusedBorder: OutlineInputBorder(
@@ -127,6 +131,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white10,
                         border: const OutlineInputBorder(),
                         hintText: 'Username',
                         focusedBorder: OutlineInputBorder(
@@ -151,6 +157,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white10,
                         border: const OutlineInputBorder(),
                         hintText: 'Password',
                         focusedBorder: OutlineInputBorder(

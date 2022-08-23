@@ -17,11 +17,15 @@ class _AllUsersState extends State<AllUsers> {
 
   Future<void> getData() async {
     await _fireStore.collection('publicUsers').get().then(
-          (value) {
+      (value) {
         for (var users in value.docs) {
           final String username = users.get('username');
           final String url = users.get('profilepicture');
-          SearchCards userCard = SearchCards(username: username, url: url,currentusername: widget.currentusername,);
+          SearchCards userCard = SearchCards(
+            username: username,
+            url: url,
+            currentusername: widget.currentusername,
+          );
           list.add(userCard);
         }
       },
@@ -54,13 +58,13 @@ class _AllUsersState extends State<AllUsers> {
             ),
             list.isNotEmpty
                 ? Expanded(
-              child: ListView.builder(
-                itemCount: list.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return list[index];
-                },
-              ),
-            )
+                    child: ListView.builder(
+                      itemCount: list.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return list[index];
+                      },
+                    ),
+                  )
                 : Expanded(child: Center(child: CircularProgressIndicator()))
           ],
         ),
@@ -70,7 +74,10 @@ class _AllUsersState extends State<AllUsers> {
 }
 
 class SearchCards extends StatelessWidget {
-  SearchCards({required this.username, required this.url, required this.currentusername});
+  SearchCards(
+      {required this.username,
+      required this.url,
+      required this.currentusername});
 
   final String url;
   final String username;
@@ -78,17 +85,17 @@ class SearchCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: SizedBox(
-        // height: MediaQuery.of(context).size.height * 0.1,
-        // width: MediaQuery.of(context).size.width *0.5,
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                ProfilePageOthers(currentUsername:username,
-                    currentUserProfilePicture: url)));
-          },
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) =>
+            ProfilePageOthers(currentUsername:username,
+                currentUserProfilePicture: url)));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: SizedBox(
+          // height: MediaQuery.of(context).size.height * 0.1,
+          // width: MediaQuery.of(context).size.width *0.5,
           child: Row(
             children: [
               CircleAvatar(
