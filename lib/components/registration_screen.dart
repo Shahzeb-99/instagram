@@ -20,31 +20,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _cloud = FirebaseFirestore.instance;
   late bool isFollowing;
 
-  void getUsernames() async {await _cloud
+  void getUsernames() async {
+    await _cloud
         .collection('publicUsers')
         .where("username", isEqualTo: username)
         .get()
         .then(
       (value) {
-         if(value.docs.isEmpty){
-          _auth.createUserWithEmailAndPassword(
-              email: email, password: password);
-          final user = {
-            "username": username,
-            "fullname": fullname,
-            "profilepicture":
-                "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?k=20&m=1223671392&s=170667a&w=0&h=kEAA35Eaz8k8A3qAGkuY8OZxpfvn9653gDjQwDHZGPE=",
-            "email": email,
-          };
-          _cloud.collection('publicUsers').doc(username).set(user);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        if (value.docs.isEmpty) {
+          _auth
+              .createUserWithEmailAndPassword(email: email, password: password)
+              .then(
+            (value) {
+              final user = {
+                "username": username,
+                "fullname": fullname,
+                "profilepicture":
+                    "https://media.istockphoto.com/vectors/default-profile-picture-avatar-photo-placeholder-vector-illustration-vector-id1223671392?k=20&m=1223671392&s=170667a&w=0&h=kEAA35Eaz8k8A3qAGkuY8OZxpfvn9653gDjQwDHZGPE=",
+                "email": email,
+                "uid":value.user?.uid,
+              };
+              _cloud.collection('publicUsers').doc(username).set(user);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                ),
+              );
+            },
+          ).onError((error, stackTrace) {
+            print('$error +++++ $stackTrace');
+          });
+        }else{
+          print('Username Already Exists');
         }
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -177,22 +189,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       getUsernames();
-
-                      // await _auth.createUserWithEmailAndPassword(
-                      //     email: email, password: password);
-                      // await _cloud
-                      //     .collection('publicUsers')
-                      //     .doc('username')
-                      //     .set({
-                      //   '$username': {
-                      //     'email': {email, fullname}
-                      //   }
-                      // });
                     },
                     style: ButtonStyle(
-                      // backgroundColor: MaterialStateProperty.all<Color>(
-                      //   Color(0xFF16A3AD),
-                      // ),
                       elevation: MaterialStateProperty.all(5),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(

@@ -57,6 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Future.delayed(const Duration(seconds: 0));
   }
 
+
+
   Future<void> getPosts() async {
     listOfPost = []; // Reset on update
     final currentUser = auth.currentUser;
