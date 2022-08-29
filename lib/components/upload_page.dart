@@ -11,8 +11,9 @@ class UploadPicture extends StatefulWidget {
   final File pickedImage;
   final String currentUsername;
 
-
-  const UploadPicture({Key? key, required this.pickedImage,required this.currentUsername}) : super(key: key);
+  const UploadPicture(
+      {Key? key, required this.pickedImage, required this.currentUsername})
+      : super(key: key);
 
   @override
   State<UploadPicture> createState() => _UploadPictureState();
@@ -46,7 +47,7 @@ class _UploadPictureState extends State<UploadPicture> {
       "timestamp": Timestamp.now(),
       "caption": caption,
       "noOfLikes": 0,
-      "noOfComments" : 0
+      "noOfComments": 0
     };
     await cloud
         .collection('publicUsers')
@@ -64,15 +65,15 @@ class _UploadPictureState extends State<UploadPicture> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text('Post'),
       ),
       body: ModalProgressHUD(
-        progressIndicator: const CircularProgressIndicator(color: Colors.white,),
+        progressIndicator: const CircularProgressIndicator(
+          color: Colors.white,
+        ),
         opacity: 0.6,
         color: Colors.black,
         inAsyncCall: progressHUD,
@@ -109,10 +110,8 @@ class _UploadPictureState extends State<UploadPicture> {
                   ),
                   IconButton(
                       onPressed: () {
-                        progressHUD=true;
-                        setState(() {
-
-                        });
+                        progressHUD = true;
+                        setState(() {});
                         uploadData(caption);
                       },
                       icon: const Icon(Icons.arrow_forward))
