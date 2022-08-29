@@ -1,20 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:instagram/components/profile_others.dart';
+import 'package:instagram/data/user_auth.dart';
+import 'package:provider/provider.dart';
 
 class Comments extends StatefulWidget {
   Comments(
-      {required this.loggedInUser,
+      {Key? key,
       required this.userProfilePicture,
       required this.username,
-      required this.postID});
+      required this.postID})
+      : super(key: key);
 
-  final String loggedInUser;
   final String username;
   final String postID;
   final String userProfilePicture;
-  TextEditingController postcontroller = TextEditingController();
+  final TextEditingController postcontroller = TextEditingController();
 
   @override
   State<Comments> createState() => _CommentsState();
@@ -61,7 +62,7 @@ class _CommentsState extends State<Comments> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Comments'),
+        title: const Text('Comments'),
         backgroundColor: Colors.black,
       ),
       body: SafeArea(
@@ -76,7 +77,8 @@ class _CommentsState extends State<Comments> {
                       },
                     ),
                   )
-                : Expanded(child: Center(child: CircularProgressIndicator())),
+                : const Expanded(
+                    child: Center(child: CircularProgressIndicator())),
             Container(
               color: Colors.white12,
               height: 50,
@@ -89,7 +91,7 @@ class _CommentsState extends State<Comments> {
                   ),
                   Expanded(
                       child: TextField(
-                        controller: widget.postcontroller,
+                    controller: widget.postcontroller,
                     onChanged: (newComment) {
                       comment = newComment;
                     },
@@ -100,14 +102,12 @@ class _CommentsState extends State<Comments> {
                   )),
                   TextButton(
                       onPressed: () {
-
                         CommentsCards userCard = CommentsCards(
-                          username: widget.loggedInUser,
+                          username: Provider.of<UserAuth>(context).username,
                           url: widget.userProfilePicture,
                           comment: comment,
                         );
                         list.add(userCard);
-
 
                         _fireStore
                             .collection('publicUsers')
@@ -117,20 +117,20 @@ class _CommentsState extends State<Comments> {
                             .collection('comments')
                             .doc()
                             .set({
-                          'username': widget.loggedInUser,
+                          'username': Provider.of<UserAuth>(context).username,
                           'comment': comment,
-                          'profilepicture': widget.userProfilePicture
+                          'profilepicture':
+                              Provider.of<UserAuth>(context).profilepicture
                         });
                         _fireStore
                             .collection('publicUsers')
                             .doc(widget.username)
                             .collection('posts')
                             .doc(widget.postID)
-                            .update({'noOfComments':FieldValue.increment(1)});
+                            .update({'noOfComments': FieldValue.increment(1)});
                         setState(() {
                           widget.postcontroller.clear();
                         });
-
                       },
                       child: const Text('Post'))
                 ],
@@ -144,8 +144,12 @@ class _CommentsState extends State<Comments> {
 }
 
 class CommentsCards extends StatelessWidget {
-  CommentsCards(
-      {required this.username, required this.url, required this.comment});
+  const CommentsCards(
+      {Key? key,
+      required this.url,
+      required this.username,
+      required this.comment})
+      : super(key: key);
 
   final String url;
   final String username;
@@ -164,7 +168,7 @@ class CommentsCards extends StatelessWidget {
               radius: 20,
               backgroundImage: CachedNetworkImageProvider(url, scale: 1),
             ),
-            SizedBox(
+            const SizedBox(
               width: 20,
             ),
             Expanded(
@@ -174,7 +178,7 @@ class CommentsCards extends StatelessWidget {
                   children: <TextSpan>[
                     TextSpan(
                         text: username,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(text: '    $comment')
                   ],
                 ),

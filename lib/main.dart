@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:instagram/components/login_screen.dart';
-import 'package:instagram/user_auth.dart';
+import 'package:instagram/data/user_auth.dart';
 import 'package:provider/provider.dart';
 import 'components/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:instagram/components/listofpost.dart';
+import 'package:instagram/data/listofpost.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +26,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (context) => UserAuth()),
-        ChangeNotifierProvider(create: (context) => ListOfPost())
+        ChangeNotifierProvider<UserAuth>(create: (context) => UserAuth()),
+        ChangeNotifierProvider<ListOfPost>(create: (context) => ListOfPost())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

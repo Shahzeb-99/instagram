@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:instagram/data/user_auth.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:provider/provider.dart';
 
 class UploadPicture extends StatefulWidget {
   final File pickedImage;
-  final String currentUsername;
+
 
   const UploadPicture(
-      {Key? key, required this.pickedImage, required this.currentUsername})
+      {Key? key, required this.pickedImage,})
       : super(key: key);
 
   @override
@@ -31,9 +33,7 @@ class _UploadPictureState extends State<UploadPicture> {
     if (kDebugMode) {
       print(fileName);
     }
-    if (kDebugMode) {
-      print(widget.currentUsername);
-    }
+
     await storageRef.putFile(widget.pickedImage);
 
     // Waits till the file is uploaded then stores the download url
@@ -42,7 +42,7 @@ class _UploadPictureState extends State<UploadPicture> {
       print(url);
     }
     final post = {
-      "username": widget.currentUsername,
+      "username": Provider.of<UserAuth>(context).username,
       "url": url,
       "timestamp": Timestamp.now(),
       "caption": caption,
@@ -51,7 +51,7 @@ class _UploadPictureState extends State<UploadPicture> {
     };
     await cloud
         .collection('publicUsers')
-        .doc(widget.currentUsername)
+        .doc(Provider.of<UserAuth>(context).username)
         .collection('posts')
         .doc()
         .set(post);

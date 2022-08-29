@@ -6,8 +6,8 @@ class UserAuth extends ChangeNotifier {
   final user = FirebaseAuth.instance;
   final cloud = FirebaseFirestore.instance;
 
-  late String username;
-  late String profilepicture;
+  String username = '';
+  String profilepicture = '';
 
   String? get uid => user.currentUser?.uid;
 
@@ -15,11 +15,15 @@ class UserAuth extends ChangeNotifier {
 
   String? get profilePicture => user.currentUser?.photoURL;
 
-  getUserdata() async {
-    cloud.collection("publicUsers").where("email", isEqualTo: email).get().then(
+  Future<void> getUserdata() async {
+    await cloud
+        .collection("publicUsers")
+        .where("email", isEqualTo: email)
+        .get()
+        .then(
       (value) {
         if (value.docs.isNotEmpty) {
-          username = value.docs[0].get('email');
+          username = value.docs[0].get('username');
           profilepicture = value.docs[0].get('profilepicture');
         }
       },

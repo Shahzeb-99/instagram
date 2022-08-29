@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:instagram/components/comments.dart';
+import '../data/user_auth.dart';
 import 'profile_others.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class Post extends StatefulWidget {
   Post(
       {Key? key,
       required this.numberofComments,
       required this.postLiked,
-      required this.loggedinUser,
       required this.postID,
       this.postPicture,
       this.username,
@@ -30,7 +31,7 @@ class Post extends StatefulWidget {
   final String? postPicture;
   final String postID;
   int numberOfLikes;
-  final String loggedinUser;
+
   int numberofComments;
   final myProfilePicture;
 
@@ -56,7 +57,7 @@ class _PostState extends State<Post> {
         .collection('posts')
         .doc(widget.postID)
         .collection('likes')
-        .where('username', isEqualTo: widget.loggedinUser)
+        .where('username', isEqualTo: Provider.of<UserAuth>(context).username)
         .get()
         .then(
       (value) {
@@ -68,7 +69,7 @@ class _PostState extends State<Post> {
               .doc(widget.postID)
               .collection('likes')
               .doc()
-              .set({'username': widget.loggedinUser});
+              .set({'username': Provider.of<UserAuth>(context).username});
           cloud
               .collection('publicUsers')
               .doc(widget.username)
@@ -213,7 +214,6 @@ class _PostState extends State<Post> {
                                   postID: widget.postID,
                                   username: widget.username!,
                                   userProfilePicture: widget.userProfilePicture,
-                                  loggedInUser: widget.loggedinUser,
                                 )));
                   },
                   child: Text(
@@ -228,7 +228,7 @@ class _PostState extends State<Post> {
                   children: [
                     CircleAvatar(
                       backgroundImage: CachedNetworkImageProvider(
-                        widget.userProfilePicture,
+                        Provider.of<UserAuth>(context).profilepicture,
                       ),
                     ),
                     SizedBox(
