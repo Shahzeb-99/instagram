@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:instagram/components/login_screen.dart';
+import 'package:instagram/user_auth.dart';
 import 'package:provider/provider.dart';
 import 'components/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,21 +19,26 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-
-  final _auth=FirebaseAuth.instance;
+  final _auth = FirebaseAuth.instance;
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (BuildContext context) => ListOfPost(),
+    return MultiProvider(
+      providers: [
+        Provider(create: (context) => UserAuth()),
+        ChangeNotifierProvider(create: (context) => ListOfPost())
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark().copyWith(
             scaffoldBackgroundColor: Colors.black,
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                backgroundColor: Colors.black, selectedItemColor: Colors.white)),
-        home:  _auth.currentUser==null?const LoginScreen():const HomeScreen(),
+                backgroundColor: Colors.black,
+                selectedItemColor: Colors.white)),
+        home: _auth.currentUser == null
+            ? const LoginScreen()
+            : const HomeScreen(),
       ),
     );
   }
