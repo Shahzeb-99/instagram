@@ -186,8 +186,21 @@ class _PostState extends State<Post> {
               SizedBox(
                 width: 10,
               ),
-              Container(
-                child: FaIcon(FontAwesomeIcons.comment),
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Comments(
+                            postID: widget.postID,
+                            username: widget.username!,
+                            userProfilePicture: widget.userProfilePicture,
+                            loggedInUser: widget.loggedinUser,
+                          )));
+                },
+                child: Container(
+                  child: FaIcon(FontAwesomeIcons.comment),
+                ),
               ),
             ],
           ),
@@ -224,21 +237,33 @@ class _PostState extends State<Post> {
                 SizedBox(
                   height: 5,
                 ),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider(
-                        widget.userProfilePicture,
+                GestureDetector(onTap: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Comments(
+                            postID: widget.postID,
+                            username: widget.username!,
+                            userProfilePicture: widget.userProfilePicture,
+                            loggedInUser: widget.loggedinUser,
+                          )));
+                },
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: CachedNetworkImageProvider(
+                          widget.userProfilePicture,
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'Add a comment...',
-                      style: TextStyle(color: Color(0xFF515357)),
-                    ),
-                  ],
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Add a comment...',
+                        style: TextStyle(color: Color(0xFF515357)),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
