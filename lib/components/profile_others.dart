@@ -1,17 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:provider/provider.dart';
+
+import '../data/user_auth.dart';
 
 class ProfilePageOthers extends StatefulWidget {
   const ProfilePageOthers(
-      {Key? key,
+      {Key? key,required this.uid,
       required this.currentUsername,
       required this.currentUserProfilePicture})
       : super(key: key);
 
+  final String uid;
   final String currentUsername;
   final String currentUserProfilePicture;
 
@@ -32,7 +35,7 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
 
     if (following == true) {
       final follower = await cloud
-          .collection('publicUsers')
+          .collection('publicUsers2')
           .doc(currentProfileUsername)
           .collection('followers')
           .where('username', isEqualTo: currentUsername)
@@ -75,22 +78,16 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
   }
 
   void isFollowing(String currentProfileUsername) async {
-    final auth = FirebaseAuth.instance;
     final cloud = FirebaseFirestore.instance;
-    var currentUser = cloud
-        .collection('publicUsers')
-        .where('email', isEqualTo: auth.currentUser?.email)
-        .get();
-    await currentUser.then((value) {
-      currentUsername = value.docs[0].get('username');
+
       cloud
-          .collection('publicUsers')
-          .doc(value.docs[0].get('username'))
+          .collection('publicUsers2')
+          .doc(Provider.of<UserAuth>(context,listen: false).uid)
           .collection('following')
-          .where('username', isEqualTo: currentProfileUsername)
+          .where('uid', isEqualTo: widget.uid)
           .get()
           .then((value) {
-        if (value.docs[0].get('username') == currentProfileUsername) {
+        if (value.docs[0].get('uid') == widget.uid) {
           setState(() {
             following = true;
           });
@@ -101,7 +98,7 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
 
       });
 
-    });
+
     setState(() {
       progressHUD = false;
     });
@@ -116,25 +113,25 @@ class _ProfilePageOthersState extends State<ProfilePageOthers> {
     }
     list = [];
     cloud
-        .collection("publicUsers")
-        .doc(currentUsername)
-        .collection("posts")
+        .collection("publicUsers2")
+        .doc(widget.uid)
+        .collection("posts").orderBy('timestamp')
         .get()
         .then(
       (value) {
         for (var posts in value.docs) {
           final url = posts.get('url');
-          if (kDebugMode) {
-            print(url);
-          }
           final post = Container(
               child: CachedNetworkImage(
             imageUrl: url,
             fit: BoxFit.fill,
           ));
-          list.add(post);
+          setState(() {
+            list.add(post);
+          });
+
         }
-        setState(() {});
+
       },
     );
   }

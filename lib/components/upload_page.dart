@@ -42,7 +42,7 @@ class _UploadPictureState extends State<UploadPicture> {
       print(url);
     }
     final post = {
-      "username": Provider.of<UserAuth>(context).username,
+      "uid": Provider.of<UserAuth>(context,listen: false).uid,
       "url": url,
       "timestamp": Timestamp.now(),
       "caption": caption,
@@ -50,11 +50,11 @@ class _UploadPictureState extends State<UploadPicture> {
       "noOfComments": 0
     };
     await cloud
-        .collection('publicUsers')
-        .doc(Provider.of<UserAuth>(context).username)
+        .collection('publicUsers2')
+        .doc(Provider.of<UserAuth>(context,listen: false).uid)
         .collection('posts')
         .doc()
-        .set(post);
+        .set(post).then((value) => print('Uploaded successfully${Provider.of<UserAuth>(context,listen: false).uid!}'));
     Navigator.pop(context);
 
 //     String fileName = widget.pickedImage.path.split('/').last;

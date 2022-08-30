@@ -18,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SafeArea(
         child: Center(
           child: Container(
@@ -40,8 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 250,
                     child: Divider(
                       thickness: 1,
-                      color: Colors.white30
-                      ,
+                      color: Colors.white30,
                     ),
                   ),
                   Padding(
@@ -73,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: TextField(
                       obscureText: true,
-
                       onChanged: (newPasswordEntry) {
                         password = newPasswordEntry;
                       },
@@ -131,7 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const RegistrationScreen()));
+                                    builder: (context) =>
+                                        const RegistrationScreen()));
                           },
                           child: const Text(
                             ' Sign up',

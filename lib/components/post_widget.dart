@@ -10,8 +10,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 class Post extends StatefulWidget {
+  final String uid;
+
   Post(
       {Key? key,
+      required this.uid,
       required this.numberofComments,
       required this.postLiked,
       required this.postID,
@@ -52,35 +55,35 @@ class _PostState extends State<Post> {
   Future<void> likeToggle() async {
     likeButtonActive = false;
     await cloud
-        .collection('publicUsers')
-        .doc(widget.username)
+        .collection('publicUsers2')
+        .doc(widget.uid)
         .collection('posts')
         .doc(widget.postID)
         .collection('likes')
-        .where('username', isEqualTo: Provider.of<UserAuth>(context).username)
+        .where('uid', isEqualTo: Provider.of<UserAuth>(context,listen : false).uid)
         .get()
         .then(
       (value) {
         if (value.docs.isEmpty) {
           cloud
-              .collection('publicUsers')
-              .doc(widget.username)
+              .collection('publicUsers2')
+              .doc(widget.uid)
               .collection('posts')
               .doc(widget.postID)
               .collection('likes')
               .doc()
-              .set({'username': Provider.of<UserAuth>(context).username});
+              .set({'uid': Provider.of<UserAuth>(context,listen : false).uid});
           cloud
-              .collection('publicUsers')
-              .doc(widget.username)
+              .collection('publicUsers2')
+              .doc(widget.uid)
               .collection('posts')
               .doc(widget.postID)
               .update({'noOfLikes': FieldValue.increment(1)});
           widget.numberOfLikes++;
         } else {
           cloud
-              .collection('publicUsers')
-              .doc(widget.username)
+              .collection('publicUsers2')
+              .doc(widget.uid)
               .collection('posts')
               .doc(widget.postID)
               .collection('likes')
@@ -88,8 +91,8 @@ class _PostState extends State<Post> {
               .delete();
 
           cloud
-              .collection('publicUsers')
-              .doc(widget.username)
+              .collection('publicUsers2')
+              .doc(widget.uid)
               .collection('posts')
               .doc(widget.postID)
               .update({'noOfLikes': FieldValue.increment(-1)});
@@ -112,9 +115,10 @@ class _PostState extends State<Post> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ProfilePageOthers(
+                    uid: widget.uid,
                       currentUsername: widget.username!,
                       currentUserProfilePicture:
-                          "https://i1.sndcdn.com/artworks-000212816587-3pxa7y-t500x500.jpg"),
+                          widget.userProfilePicture),
                 ),
               );
             },
@@ -125,7 +129,7 @@ class _PostState extends State<Post> {
                 ),
                 CircleAvatar(
                   backgroundImage: CachedNetworkImageProvider(
-                    "https://i1.sndcdn.com/artworks-000212816587-3pxa7y-t500x500.jpg",
+                    widget.userProfilePicture,
                   ),
                 ),
                 SizedBox(
@@ -210,7 +214,7 @@ class _PostState extends State<Post> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Comments(
+                            builder: (context) => Comments(uid: widget.uid,
                                   postID: widget.postID,
                                   username: widget.username!,
                                   userProfilePicture: widget.userProfilePicture,
@@ -228,7 +232,7 @@ class _PostState extends State<Post> {
                   children: [
                     CircleAvatar(
                       backgroundImage: CachedNetworkImageProvider(
-                        Provider.of<UserAuth>(context).profilepicture,
+                        Provider.of<UserAuth>(context,listen : false).profilepicture,
                       ),
                     ),
                     SizedBox(

@@ -10,14 +10,14 @@ class ListOfPost extends ChangeNotifier{
 
   List<Container> list = [];
 
-  void getPost(String currentUsername) {
+  void getPost(String uid) {
     if (kDebugMode) {
-      print(currentUsername);
+      print(uid);
     }
     list = [];
     cloud
-        .collection("publicUsers")
-        .doc(currentUsername)
+        .collection("publicUsers2")
+        .doc(uid)
         .collection("posts")
         .get()
         .then(

@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:instagram/components/profile_others.dart';
+import 'package:instagram/data/user_auth.dart';
+import 'package:provider/provider.dart';
 
 class AllUsers extends StatefulWidget {
   const AllUsers({Key? key, this.currentusername}) : super(key: key);
@@ -16,17 +18,20 @@ class _AllUsersState extends State<AllUsers> {
   List<SearchCards> list = [];
 
   Future<void> getData() async {
-    await _fireStore.collection('publicUsers').get().then(
+    await _fireStore.collection('publicUsers2').get().then(
       (value) {
         for (var users in value.docs) {
-          final String username = users.get('username');
-          final String url = users.get('profilepicture');
-          SearchCards userCard = SearchCards(
-            username: username,
-            url: url,
-            currentusername: widget.currentusername,
-          );
-          list.add(userCard);
+          if(users.get('uid')!=Provider.of<UserAuth>(context,listen: false).uid){
+            final String username = users.get('username');
+            final String uid = users.get('uid');
+            final String url = users.get('profilepicture');
+            SearchCards userCard = SearchCards(
+              uid: uid,
+              username: username,
+              url: url,
+            );
+            list.add(userCard);
+          }
         }
       },
     );
@@ -74,22 +79,23 @@ class _AllUsersState extends State<AllUsers> {
 }
 
 class SearchCards extends StatelessWidget {
-  SearchCards(
-      {required this.username,
-      required this.url,
-      required this.currentusername});
+  SearchCards({required this.username, required this.url,required this.uid});
 
   final String url;
+  final String uid;
   final String username;
-  final String currentusername;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) =>
-            ProfilePageOthers(currentUsername:username,
-                currentUserProfilePicture: url)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilePageOthers(
+                    uid: uid,
+                    currentUsername: username,
+                    currentUserProfilePicture: url)));
       },
       child: Padding(
         padding: const EdgeInsets.all(20),

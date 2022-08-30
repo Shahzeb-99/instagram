@@ -17,8 +17,8 @@ class UserAuth extends ChangeNotifier {
 
   Future<void> getUserdata() async {
     await cloud
-        .collection("publicUsers")
-        .where("email", isEqualTo: email)
+        .collection("publicUsers2")
+        .where("uid", isEqualTo: uid)
         .get()
         .then(
       (value) {
@@ -28,5 +28,7 @@ class UserAuth extends ChangeNotifier {
         }
       },
     );
+
+    notifyListeners();
   }
 }

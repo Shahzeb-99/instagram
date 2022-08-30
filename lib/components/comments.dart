@@ -7,11 +7,13 @@ import 'package:provider/provider.dart';
 class Comments extends StatefulWidget {
   Comments(
       {Key? key,
+      required this.uid,
       required this.userProfilePicture,
       required this.username,
       required this.postID})
       : super(key: key);
 
+  final String uid;
   final String username;
   final String postID;
   final String userProfilePicture;
@@ -28,8 +30,8 @@ class _CommentsState extends State<Comments> {
 
   Future<void> getComments() async {
     await _fireStore
-        .collection('publicUsers')
-        .doc(widget.username)
+        .collection('publicUsers2')
+        .doc(widget.uid)
         .collection('posts')
         .doc(widget.postID)
         .collection('comments')
@@ -38,14 +40,23 @@ class _CommentsState extends State<Comments> {
       (value) {
         for (var users in value.docs) {
           final String comment = users.get('comment');
-          final String username = users.get('username');
-          final String url = users.get('profilepicture');
-          CommentsCards userCard = CommentsCards(
-            username: username,
-            url: url,
-            comment: comment,
-          );
-          list.add(userCard);
+          final String uid = users.get('uid');
+
+          final cloud = FirebaseFirestore.instance;
+          cloud
+              .collection('publicUsers2')
+              .where("uid", isEqualTo: uid)
+              .get()
+              .then((value) {
+            final username = value.docs[0].get('username');
+            final profilepicture = value.docs[0].get('profilepicture');
+            CommentsCards userCard = CommentsCards(
+              username: username,
+              url: profilepicture,
+              comment: comment,
+            );
+            list.add(userCard);
+          });
         }
       },
     );
@@ -103,28 +114,27 @@ class _CommentsState extends State<Comments> {
                   TextButton(
                       onPressed: () {
                         CommentsCards userCard = CommentsCards(
-                          username: Provider.of<UserAuth>(context).username,
-                          url: widget.userProfilePicture,
+                          username: Provider.of<UserAuth>(context,listen: false).username,
+                          url: Provider.of<UserAuth>(context,listen: false).profilepicture,
                           comment: comment,
                         );
                         list.add(userCard);
 
                         _fireStore
-                            .collection('publicUsers')
-                            .doc(widget.username)
+                            .collection('publicUsers2')
+                            .doc(widget.uid)
                             .collection('posts')
                             .doc(widget.postID)
                             .collection('comments')
                             .doc()
                             .set({
-                          'username': Provider.of<UserAuth>(context).username,
+                          'uid': Provider.of<UserAuth>(context,listen: false).uid,
                           'comment': comment,
-                          'profilepicture':
-                              Provider.of<UserAuth>(context).profilepicture
+
                         });
                         _fireStore
-                            .collection('publicUsers')
-                            .doc(widget.username)
+                            .collection('publicUsers2')
+                            .doc(widget.uid)
                             .collection('posts')
                             .doc(widget.postID)
                             .update({'noOfComments': FieldValue.increment(1)});

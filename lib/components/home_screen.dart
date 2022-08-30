@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final cloud = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   String currentUserProfilePicture = '';
-  String currentUsername = '';
+  String uid = '';
   List<Post> listOfPost = []; // List of Post used in Listview Builder
 
   Future<void> updateNewsfeed() async {
@@ -56,8 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Future.delayed(const Duration(seconds: 0));
   }
-
-
 
   @override
   void initState() {
@@ -101,142 +99,161 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
           controller: pageController,
-          children: [NewsFeed(), UploadPage(), ProfilePage()],
+          children: [
+            NewsFeed(),
+            const UploadPage(),
+            const ProfilePage(),
+          ],
         ),
       ),
     );
   }
 
-  Container NewsFeed() {
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const SizedBox(
-                width: 10,
-              ),
-              SizedBox(
-                height: 50,
-                child: Image.asset('assets/Instagram_logo.png'),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Expanded(
-            child: listOfPost.isNotEmpty // Check list of post
-                ? RefreshIndicator(
-                    onRefresh: updateNewsfeed,
-                    child: ListView.builder(
-                      physics:
-                          const ScrollPhysics(parent: BouncingScrollPhysics()),
-                      key: const PageStorageKey<String>(''),
-                      itemCount: listOfPost.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return listOfPost[index];
-                      },
-                    ),
-                  )
-                : postCheck ==
-                        false // If List is empty and updateNewfeed() still running show CircleProgressIndicator else Text and Refresh Button
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                      )
-                    : Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('No Post'),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            OutlinedButton(
-                                style: ButtonStyle(
-                                    overlayColor: MaterialStateProperty.all(
-                                        Colors.cyanAccent)),
-                                onPressed: () {
-                                  Future.delayed(Duration(seconds: 1), () {
-                                    updateNewsfeed();
-                                  });
-                                },
-                                child: const Text('Tap to Refresh'))
-                          ],
-                        ),
+  Column NewsFeed() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const SizedBox(
+              width: 10,
+            ),
+            SizedBox(
+              height: 50,
+              child: Image.asset('assets/Instagram_logo.png'),
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Expanded(
+          child: listOfPost.isNotEmpty // Check list of post
+              ? RefreshIndicator(
+                  onRefresh: updateNewsfeed,
+                  child: ListView.builder(
+                    physics:
+                        const ScrollPhysics(parent: BouncingScrollPhysics()),
+                    key: const PageStorageKey<String>(''),
+                    itemCount: listOfPost.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return listOfPost[index];
+                    },
+                  ),
+                )
+              : postCheck ==
+                      false // If List is empty and updateNewfeed() still running show CircleProgressIndicator else Text and Refresh Button
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
                       ),
-          ), // Post()
-        ],
-      ),
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('No Post'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          OutlinedButton(
+                              style: ButtonStyle(
+                                  overlayColor: MaterialStateProperty.all(
+                                      Colors.cyanAccent)),
+                              onPressed: () {
+                                Future.delayed(const Duration(seconds: 1), () {
+                                  updateNewsfeed();
+                                });
+                              },
+                              child: const Text('Tap to Refresh'))
+                        ],
+                      ),
+                    ),
+        ), // Post()
+      ],
     );
   }
+
   Future<void> getPosts() async {
+    String postUsername = '';
+    String postProfilePicture = '';
+
     await Provider.of<UserAuth>(context, listen: false).getUserdata();
     listOfPost = []; // Reset on update
 
-    currentUsername = Provider.of<UserAuth>(context, listen: false).username;
+    uid = Provider.of<UserAuth>(context, listen: false).uid!;
     currentUserProfilePicture =
         Provider.of<UserAuth>(context, listen: false).profilepicture;
 
     Provider.of<ListOfPost>(context, listen: false)
-        .getPost(currentUsername); // Refresh ProfilePage Posts
+        .getPost(uid); // Refresh ProfilePage Posts
     await cloud
-        .collection("publicUsers")
-        .doc(currentUsername)
+        .collection("publicUsers2")
+        .doc(Provider.of<UserAuth>(context, listen: false).uid)
         .collection("following")
         .get()
         .then(
-          (value) async {
+      (value) async {
+        await cloud
+            .collection('publicUsers2')
+            .where('uid', isEqualTo: value.docs[0].get('uid'))
+            .get()
+            .then((value) {
+          postUsername = value.docs[0].get('username');
+          postProfilePicture = value.docs[0].get('profilepicture');
+        });
         for (var user in value.docs) {
           await cloud
-              .collection("publicUsers")
-              .doc(user.get('username'))
+              .collection("publicUsers2")
+              .doc(user.get('uid'))
               .collection("posts")
               .get()
               .then(
-                (value) async {
-              for (var posts in value.docs) {
-                print(currentUsername);
-                final postid = posts.id;
+            (value) async {
+              if (value.docs.isNotEmpty) {
+                for (var posts in value.docs) {
+                  final postid = posts.id;
 
-                await posts.reference
-                    .collection('likes')
-                    .where('username', isEqualTo: currentUsername)
-                    .get()
-                    .then((value) {
-                  if (value.docs.isNotEmpty) {
-                    postLiked = true;
-                  } else {
-                    postLiked = false;
-                  }
-                });
-                final url = posts.get('url');
-                print(url);
-                final username = posts.get('username');
-                print(username);
-                final caption = posts.get('caption');
-                print(caption);
-                final timestamp = posts.get('timestamp');
-                final noOfComments = posts.get('noOfComments');
-                final noOfLikes = posts.get('noOfLikes');
-                print(noOfLikes);
-                final post = Post(
-                  userProfilePicture: currentUserProfilePicture,
-                  numberofComments: noOfComments,
-                  postLiked: postLiked,
-                  postID: postid,
-                  numberOfLikes: noOfLikes,
-                  postPicture: url,
-                  username: username,
-                  caption: caption,
-                );
+                  await posts.reference
+                      .collection('likes')
+                      .where('uid',
+                          isEqualTo:
+                              Provider.of<UserAuth>(context, listen: false).uid)
+                      .get()
+                      .then((value) {
+                    if (value.docs.isNotEmpty) {
+                      postLiked = true;
+                    } else {
+                      postLiked = false;
+                    }
+                  });
+                  final url = posts.get('url');
+                  final uid = posts.get('uid');
+                  print(url);
+                  final username = postUsername;
+                  print(username);
+                  final caption = posts.get('caption');
+                  print(caption);
+                  final timestamp = posts.get('timestamp');
+                  final noOfComments = posts.get('noOfComments');
+                  final noOfLikes = posts.get('noOfLikes');
+                  print(noOfLikes);
+                  final post = Post(
+                    userProfilePicture: postProfilePicture,
+                    numberofComments: noOfComments,
+                    postLiked: postLiked,
+                    postID: postid,
+                    numberOfLikes: noOfLikes,
+                    postPicture: url,
+                    username: username,
+                    caption: caption,
+                    uid: uid,
+                  );
 
-                setState(() {
-                  listOfPost.add(post);
-                });
+                  setState(() {
+                    listOfPost.add(post);
+                  });
+                }
               }
             },
           );
